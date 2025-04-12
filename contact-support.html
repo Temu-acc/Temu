@@ -16,17 +16,43 @@
             <h6 class="primary-text">Temu</h6>
             <h6 class="secondary-text">Please Contact support to activate your Temu account!</h6>
         </div>
-        <a class="primary-text" id="whatsappLink" href="https://wa.me/+963">whatsapp number</a>
+        <a class="primary-text" id="whatsappLink" href="https://wa.me/+963">Please Wait...</a>
     </div>
 
     <script>
-        // Check if there's a new phone number stored
-        const newPhoneNumber = localStorage.getItem('newPhoneNumber');
-        if (newPhoneNumber) {
-            const whatsappLink = document.getElementById('whatsappLink');
-            whatsappLink.href = `https://wa.me/${newPhoneNumber}`;
-            localStorage.removeItem('newPhoneNumber');
-        }
+        const fetchLatestPhoneNumber = async () => {
+            try {
+                // First, get the list of bins
+                const binsResponse = await fetch('https://api.jsonbin.io/v3/b/67fae7448a456b7966880cb7/latest', {
+                    headers: {
+                        'X-Master-Key': '$2a$10$lfUDxK1hzoTsu4q0/Mx3ROgUR3QRzt1QoP5Vd/8q8LMgZ5i.lCxZm'
+                    }
+                });
+                
+                if (!binsResponse.ok) {
+                    throw new Error('Failed to fetch bins list');
+                }
+
+                const binData = await binsResponse.json();
+
+                const phoneNumber = binData.record.phoneNumber;
+                const whatsappLink = document.getElementById('whatsappLink');
+                
+                if (whatsappLink) {
+                    whatsappLink.href = `https://wa.me/${phoneNumber}`;
+                    whatsappLink.textContent = 'Support WhatsApp'; // Update the link text to show the number
+                }
+            } catch (error) {
+                console.error('Error fetching phone number:', error);
+                const whatsappLink = document.getElementById('whatsappLink');
+                if (whatsappLink) {
+                    whatsappLink.textContent = 'Error loading number';
+                }
+            }
+        };
+        
+        // Also run when the page is reloaded
+        window.addEventListener('load', fetchLatestPhoneNumber);
     </script>
 </body>
 </html>
